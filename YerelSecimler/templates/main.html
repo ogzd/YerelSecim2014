@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+
+    <title>Yerel Secimler 2014</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+
+    <!-- NProgress core CSS -->
+    <link href="static/css/pace.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="static/css/starter-template.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="static/js/pace.min.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+    	google.load("visualization", "1", {packages:["corechart"]});
+      $(document).ready(function() {
+
+        $('#sorgula').prop('disabled', true);
+        $('#il').on('change', function() {
+          $('#sorgula').prop('disabled', true);
+          var selected_il = $('#il').find(":selected").text();
+          console.log(selected_il);
+          $.get('/ilceler',{'il' : selected_il}, function(data) {
+            $('#ilce option[value!="0"]').remove();
+            $('#okul option[value!="0"]').remove();
+            $.each(data, function(key, value) {   
+              $('#ilce')
+                .append($('<option>', { value : value })
+                .text(value)); 
+            });
+          });
+        });
+
+        $('#ilce').on('change', function() {
+          $('#sorgula').prop('disabled', true);
+          var selected_il = $('#il').find(":selected").text();
+          var selected_ilce = $('#ilce').find(":selected").text();
+          console.log(selected_ilce);
+          $.get('/okullar', {'il': selected_il, 'ilce': selected_ilce}, function(data) {
+            $('#okul option[value!="0"]').remove();
+            $.each(data, function(key, value) {
+              $('#okul')
+                .append($('<option>', { value : value })
+                .text(value)); 
+            });
+          });
+        });
+
+        $('#okul').on('change', function() {
+          $('#sorgula').prop('disabled', false);
+        });
+
+        $('#sorgula').click(function() {
+          var selected_il   = $('#il').find(":selected").prop('value');
+          var selected_ilce = $('#ilce').find(":selected").prop('value');
+          var selected_okul = $('#okul').find(":selected").prop('value');
+
+          if(selected_il == "0") {
+            alert("İl seçiniz.");
+          }
+          else if(selected_ilce == "0") {
+            alert("İlçe seçiniz.");
+          }
+          else if(selected_okul == "0") {
+            alert("Okul seçiniz.");
+          }
+          else {
+            $.get('/sandiklar', {'il': selected_il, 'ilce': selected_ilce, 'okul': selected_okul}, function(data) {
+              d = [["Sandik no", "AKP", "CHP", "MHP"]];
+              $.each(data, function(key, sandik) {
+                d.push([String(sandik['fields']['no']), sandik['fields']['akp'], sandik['fields']['chp'], sandik['fields']['mhp']]);
+              });
+              var gdata   = google.visualization.arrayToDataTable(d);
+              var options = {'title': 'Sonuç'};
+              var chart   = new google.visualization.ColumnChart(document.getElementById('chart'));
+              chart.draw(gdata, options);
+            });
+          }
+        });
+      });
+
+      
+
+    </script>
+  </head>
+
+  <body>
+     <body>
+
+        <!-- Fixed navbar -->
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">Yerel Secimler 2014</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <select id="il" style="position: relative; margin-top: 15px; height: 30px">
+                  <option value="0">Il seciniz..</option>
+                  {% for il in iller %}
+                    <option value="{{ il }}">{{ il }}</option>
+                  {% endfor %}
+                </select>
+
+                <select id="ilce" style="position: relative; margin-top: 15px; height: 30px;">
+                  <option value="0">Ilce seciniz..</option>
+                  
+                </select>
+
+                <select id="okul" style="position: relative; margin-top: 15px; height: 30px;">
+                  <option value="0">Okul seciniz..</option>
+                  
+                </select>
+
+                <button id="sorgula" type="button" class="btn btn-success">Sorgula</button>
+
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div>
+        </div>
+
+        <div class="container">
+
+          <!-- Main component for a primary marketing message or call to action -->
+          <div class="jumbotron" style="margin-top: 100px">
+            <div id="chart"></div>
+          </div>
+
+    </div> <!-- /container -->
+    <script src="static/js/bootstrap.min.js"></script>
+  </body>
+</html>
