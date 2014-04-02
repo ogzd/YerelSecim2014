@@ -10,7 +10,7 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
 
-        start = 273964 
+        start = 273964 # hardcoded for Istanbul
         end   = 305948 # exclusive
         
         # connect to sts.chp.org
