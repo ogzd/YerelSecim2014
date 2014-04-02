@@ -46,15 +46,15 @@ class Command(NoArgsCommand):
         except:
             akp = 0
         try:    
-            chp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_4'})['value']
+            chp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_5'})['value']
         except:
             chp = 0
         try:
-            mhp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_6'})['value']
+            mhp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_7'})['value']
         except:
             mhp = 0
         try:
-            bdp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_3'})['value']
+            bdp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_4'})['value']
         except:
             bdp = 0
 
