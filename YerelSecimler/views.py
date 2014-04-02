@@ -33,5 +33,26 @@ def get_sandiklar(request):
 
 	return HttpResponse(serializers.serialize('json', sandiks), content_type = 'application/json')
 
+def get_sandiklar_ozet(request):
+	il 	 = request.GET['il']
+	ilce = request.GET['ilce']
+	okul = request.GET['okul']
+	
+	sandiks = Sandik.objects.filter(il = il).filter(ilce = ilce).filter(okul = okul).values()
+
+	r = { 
+		  'toplam_secmen':  sum([sandik['secmen'] for sandik in sandiks]),
+		  'toplam_katilan': sum([sandik['toplam'] for sandik in sandiks]),
+		  'toplam_gecerli': sum([sandik['gecerli'] for sandik in sandiks]),
+		  'toplam_akp':		sum([sandik['akp'] for sandik in sandiks]),
+		  'toplam_chp':		sum([sandik['chp'] for sandik in sandiks]),
+		  'toplam_mhp':     sum([sandik['mhp'] for sandik in sandiks]),
+		  'toplam_bdp':		sum([sandik['bdp'] for sandik in sandiks]) 
+		}
+
+	return HttpResponse(json.dumps(r), content_type = 'application/json')
+
+
+
 
 

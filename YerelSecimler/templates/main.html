@@ -16,8 +16,46 @@
     <!-- NProgress core CSS -->
     <link href="static/css/pace.css" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
-    <link href="static/css/starter-template.css" rel="stylesheet">
+    <style type="text/css">
+
+      /* Sticky footer styles
+      -------------------------------------------------- */
+
+      html,
+      body {
+        height: 100%;
+        /* The html and body elements cannot have any padding or margin. */
+      }
+
+      /* Wrapper for page content to push down footer */
+      #wrap {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        /* Negative indent footer by it's height */
+        margin: 0 auto -60px;
+      }
+
+      /* Set the fixed height of the footer here */
+      #push,
+      #footer {
+        height: 60px;
+      }
+      #footer {
+        background-color: #f5f5f5;
+      }
+
+      /* Lastly, apply responsive CSS fixes as necessary */
+      @media (max-width: 767px) {
+        #footer {
+          margin-left: -20px;
+          margin-right: -20px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+
+    </style>
 
     <!-- Just for debugging purposes. Don't actually copy this line! -->
     <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -36,8 +74,10 @@
       $(document).ready(function() {
 
         $('#sorgula').prop('disabled', true);
+        $('#ozet').prop('disabled', true);
         $('#il').on('change', function() {
           $('#sorgula').prop('disabled', true);
+          $('#ozet').prop('disabled', true)
           var selected_il = $('#il').find(":selected").text();
           console.log(selected_il);
           $.get('/ilceler',{'il' : selected_il}, function(data) {
@@ -53,6 +93,7 @@
 
         $('#ilce').on('change', function() {
           $('#sorgula').prop('disabled', true);
+          $('#ozet').prop('disabled', true);
           var selected_il = $('#il').find(":selected").text();
           var selected_ilce = $('#ilce').find(":selected").text();
           console.log(selected_ilce);
@@ -68,6 +109,7 @@
 
         $('#okul').on('change', function() {
           $('#sorgula').prop('disabled', false);
+          $('#ozet').prop('disabled', false);
         });
 
         $('#sorgula').click(function() {
@@ -86,73 +128,143 @@
           }
           else {
             $.get('/sandiklar', {'il': selected_il, 'ilce': selected_ilce, 'okul': selected_okul}, function(data) {
-              d = [["Sandik no", "AKP", "CHP", "MHP"]];
+              $('#jumbo').addClass('jumbotron');
+              var d1 = [["Sandik no", "AKP", "CHP", "MHP"]];
               $.each(data, function(key, sandik) {
-                d.push([String(sandik['fields']['no']), sandik['fields']['akp'], sandik['fields']['chp'], sandik['fields']['mhp']]);
+                d1.push([String(sandik['fields']['no']), sandik['fields']['akp'], sandik['fields']['chp'], sandik['fields']['mhp']]);
               });
-              var gdata   = google.visualization.arrayToDataTable(d);
-              var options = {'title': 'Sonuç'};
-              var chart   = new google.visualization.ColumnChart(document.getElementById('chart'));
-              chart.draw(gdata, options);
+              var gdata1    = google.visualization.arrayToDataTable(d1);
+              var options1  = { title: 'Sandık Sonuçları', hAxis: {title: 'Sandık no'} };
+              var chart1    = new google.visualization.ColumnChart(document.getElementById('chart1'));
+              chart1.draw(gdata1, options1);
+
+              d2 = [["Sandik no", "Seçmen", "Katılan", "Geçerli"]];
+              $.each(data, function(key, sandik) {
+                d2.push([String(sandik['fields']['no']), sandik['fields']['secmen'], sandik['fields']['toplam'], sandik['fields']['gecerli']]);
+              });
+              var gdata2    = google.visualization.arrayToDataTable(d2);
+              var options2  = { title: 'Sandık bilgileri', hAxis: {title: 'Sandık no'}, colors: ['#8B0707', '#A2C180', '#DC3912']};
+              var chart2    = new google.visualization.ColumnChart(document.getElementById('chart2'));
+              chart2.draw(gdata2, options2);
             });
           }
         });
+
+        $('#ozet').click(function() {
+          var selected_il   = $('#il').find(":selected").prop('value');
+          var selected_ilce = $('#ilce').find(":selected").prop('value');
+          var selected_okul = $('#okul').find(":selected").prop('value');
+
+          if(selected_il == "0") {
+            alert("İl seçiniz.");
+          }
+          else if(selected_ilce == "0") {
+            alert("İlçe seçiniz.");
+          }
+          else if(selected_okul == "0") {
+            alert("Okul seçiniz.");
+          }
+          else {
+            $.get('/sandiklar_ozet', {'il': selected_il, 'ilce': selected_ilce, 'okul': selected_okul}, function(data) {
+              var data1 = google.visualization.arrayToDataTable([['Oy', 'Sayi'], 
+                                                                ['AKP', data['toplam_akp']],
+                                                                ['CHP', data['toplam_chp']],
+                                                                ['MHP', data['toplam_mhp']],
+                                                                ['BDP', data['toplam_bdp']]]);
+              var options = {
+                title: 'Oy Dağılımları',
+                is3D: true,
+              }; 
+              var chart1 = new google.visualization.PieChart(document.getElementById('pchart'));
+              chart1.draw(data1, options);
+
+              var data2 = google.visualization.arrayToDataTable([['Oy', 'Sayi'],
+                                                                 ['Seçmen', data['toplam_secmen']],
+                                                                 ['Katılan', data['toplam_katilan']],
+                                                                 ['Geçerli', data['toplam_gecerli']]]);
+              var options2 = {
+                title: 'Katılım',
+              };
+
+              var chart2 = new google.visualization.ColumnChart(document.getElementById('cchart'));
+              chart2.draw(data2, options2);
+            });
+          }
+        });
+
+
       });
-
-      
-
     </script>
   </head>
 
   <body>
      <body>
+        <div id="wrap">
+          <!-- Fixed navbar -->
+          <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+              <div class="navbar-header">
+                <a class="navbar-brand" href="#">Yerel Secimler 2014</a>
+              </div>
+              <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                  <select id="il" style="position: relative; padding: 15px 15px;">
+                    <option value="0">İl seçiniz..</option>
+                    {% for il in iller %}
+                      <option value="{{ il }}">{{ il }}</option>
+                    {% endfor %}
+                  </select>
 
-        <!-- Fixed navbar -->
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="#">Yerel Secimler 2014</a>
+                  <select id="ilce" style="padding: 15px 15px;">
+                    <option value="0">İlçe seçiniz..</option>
+                    
+                  </select>
+
+                  <select id="okul" style="padding: 15px 15px; max-width: 400px;">
+                    <option value="0">Okul seçiniz..</option>
+                    
+                  </select>
+                </ul>
+                <div class="btn-group pull-right">
+                    <button id="sorgula" type="button" class="btn btn-success" style="padding: 15px 15px;">Sorgula</button>
+                    <button id="ozet" type="button" class="btn btn-danger" style="padding: 15px 15px;" data-toggle="modal" data-target="#myModal" >Özet</button>
+              </div>
+              </div><!--/.nav-collapse -->
             </div>
-            <div class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <select id="il" style="position: relative; margin-top: 15px; height: 30px">
-                  <option value="0">Il seciniz..</option>
-                  {% for il in iller %}
-                    <option value="{{ il }}">{{ il }}</option>
-                  {% endfor %}
-                </select>
+          </div>
 
-                <select id="ilce" style="position: relative; margin-top: 15px; height: 30px;">
-                  <option value="0">Ilce seciniz..</option>
-                  
-                </select>
+          <div class="container">
 
-                <select id="okul" style="position: relative; margin-top: 15px; height: 30px;">
-                  <option value="0">Okul seciniz..</option>
-                  
-                </select>
+            <!-- Main component for a primary marketing message or call to action -->
+            <div id="jumbo" style="margin-top: 50px">
+              <div id="chart1"></div>
+              <div id="chart2" style="margin-top: 50px;"></div>
+            </div>
 
-                <button id="sorgula" type="button" class="btn btn-success">Sorgula</button>
+      </div> <!-- /container -->
 
-              </ul>
-            </div><!--/.nav-collapse -->
+
+      <!-- Modal -->
+      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content" style="width:450px;">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel">Özet</h4>
+            </div>
+            <div id="ozet-body" class="modal-body jumbotron">
+              <div id="pchart"></div>
+              <div id="cchart"></div>
+            </div>
           </div>
         </div>
-
-        <div class="container">
-
-          <!-- Main component for a primary marketing message or call to action -->
-          <div class="jumbotron" style="margin-top: 100px">
-            <div id="chart"></div>
-          </div>
-
-    </div> <!-- /container -->
+      </div>
+    </div>
+    <div id="footer">
+      <div class="container">
+        <p class="muted credit">Bu bir <a href="http://twitter.com/oguz_dmr">Oğuz Demir</a> eseridir. Bütün veriler <a href="http://sts.chp.org.tr">CHP</a> websitesinden alınmıştır.</p>
+      </div>
+    </div>
     <script src="static/js/bootstrap.min.js"></script>
   </body>
 </html>
