@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta property="fb:app_id" content="443113239156854"/>
     <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-    <title>Yerel Secimler 2014</title>
+    <title>Yerel Seçimler 2014</title>
 
     <!-- Bootstrap core CSS -->
     <link href="static/css/bootstrap.css" rel="stylesheet">
@@ -71,15 +72,25 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
     	google.load("visualization", "1", {packages:["corechart"]});
-      $(document).ready(function() {
-
+      
+      function disableButtons() {
         $('#sorgula').prop('disabled', true);
         $('#ozet').prop('disabled', true);
+        $('#yorumla').prop('disabled', true);
+      }
+
+      function enableButtons() {
+        $('#sorgula').prop('disabled', false);
+        $('#ozet').prop('disabled', false);
+        $('#yorumla').prop('disabled', false);
+      }
+
+      $(document).ready(function() {
+
+        disableButtons();
         $('#il').on('change', function() {
-          $('#sorgula').prop('disabled', true);
-          $('#ozet').prop('disabled', true)
+          disableButtons();
           var selected_il = $('#il').find(":selected").text();
-          console.log(selected_il);
           $.get('/ilceler',{'il' : selected_il}, function(data) {
             $('#ilce option[value!="0"]').remove();
             $('#okul option[value!="0"]').remove();
@@ -92,11 +103,9 @@
         });
 
         $('#ilce').on('change', function() {
-          $('#sorgula').prop('disabled', true);
-          $('#ozet').prop('disabled', true);
+          disableButtons();
           var selected_il = $('#il').find(":selected").text();
           var selected_ilce = $('#ilce').find(":selected").text();
-          console.log(selected_ilce);
           $.get('/okullar', {'il': selected_il, 'ilce': selected_ilce}, function(data) {
             $('#okul option[value!="0"]').remove();
             $.each(data, function(key, value) {
@@ -108,8 +117,7 @@
         });
 
         $('#okul').on('change', function() {
-          $('#sorgula').prop('disabled', false);
-          $('#ozet').prop('disabled', false);
+          enableButtons();
         });
 
         $('#sorgula').click(function() {
@@ -184,6 +192,7 @@
                                                                  ['Geçerli', data['toplam_gecerli']]]);
               var options2 = {
                 title: 'Katılım',
+                vAxis: {minValue: 0}
               };
 
               var chart2 = new google.visualization.ColumnChart(document.getElementById('cchart'));
@@ -191,14 +200,32 @@
             });
           }
         });
+        $('#yorumla').click(function() {
+          var selected_il   = $('#il').find(":selected").prop('value');
+          var selected_ilce = $('#ilce').find(":selected").prop('value');
+          var selected_okul = $('#okul').find(":selected").prop('value');
 
+          var URL = 'http://ogzd.me/sorgu?il=' + encodeURIComponent(selected_il) + '&ilce=' + encodeURIComponent(selected_ilce) + '&okul=' + encodeURIComponent(selected_okul);
+          
+          $('#yorum-body').empty();
+          $('#yorum-body').append('<div class="fb-comments" data-href="' + URL +'" data-numposts="5" data-colorscheme="light" width="400px"></div>');
+          FB.XFBML.parse();
+        });
 
       });
     </script>
   </head>
 
-  <body>
      <body>
+      <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=443113239156854";
+            fjs.parentNode.insertBefore(js, fjs);
+          }(document, 'script', 'facebook-jssdk'));</script>
+      
         <div id="wrap">
           <!-- Fixed navbar -->
           <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -228,6 +255,7 @@
                 <div class="btn-group pull-right">
                     <button id="sorgula" type="button" class="btn btn-success" style="padding: 15px 15px;">Sorgula</button>
                     <button id="ozet" type="button" class="btn btn-danger" style="padding: 15px 15px;" data-toggle="modal" data-target="#myModal" >Özet</button>
+                    <button id="yorumla" type="button" class="btn btn-primary" style="padding: 15px 15px;" data-toggle="modal" data-target="#myModal2">Yorumla</button>
               </div>
               </div><!--/.nav-collapse -->
             </div>
@@ -244,7 +272,7 @@
       </div> <!-- /container -->
 
 
-      <!-- Modal -->
+      <!-- Modal for Ozet -->
       <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content" style="width:450px;">
@@ -259,7 +287,27 @@
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Modal for Yorumla -->
+      <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content" style="width:450px;">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel">Yorumlar</h4>
+            </div>
+            <div id="yorum-body" class="modal-body jumbotron">
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /wrap -->
+
+
+
+
     <div id="footer">
       <div class="container">
         <p class="muted credit">Bu bir <a href="http://twitter.com/oguz_dmr">Oğuz Demir</a> eseridir. Bütün veriler <a href="http://sts.chp.org.tr">CHP</a> websitesinden alınmıştır.</p>

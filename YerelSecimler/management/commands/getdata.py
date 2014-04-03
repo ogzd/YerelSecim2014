@@ -10,8 +10,8 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
 
-        start = 273964 # hardcoded for Istanbul
-        end   = 305948 # exclusive
+        start = 306129 # hardcoded for Izmir
+        end   = 316425 # exclusive
         
         # connect to sts.chp.org
         for i in range(start, end):
@@ -42,19 +42,19 @@ class Command(NoArgsCommand):
         
         # find votes of the parties
         try: 
-            akp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_1_tbPartiOy_1_1_5'})['value']
+            akp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_1_tbPartiOy_1_1_6'})['value']
         except:
             akp = 0
         try:    
-            chp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_5'})['value']
+            chp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_6'})['value']
         except:
             chp = 0
         try:
-            mhp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_7'})['value']
+            mhp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_8'})['value']
         except:
             mhp = 0
         try:
-            bdp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_4'})['value']
+            bdp = soup.find('input', {'id': 'TabContainer_TabPanel1_rptPartiler_1_2_tbPartiOy_1_2_5'})['value']
         except:
             bdp = 0
 
