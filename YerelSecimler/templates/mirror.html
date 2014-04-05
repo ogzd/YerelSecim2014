@@ -204,7 +204,7 @@
             var selected_ilce = $('#ilce').find(":selected").prop('value');
             var selected_okul = $('#okul').find(":selected").prop('value');
 
-            var URL = 'http://ogzd.me/sorgu?il=' + encodeURIComponent(selected_il) + '&ilce=' + encodeURIComponent(selected_ilce) + '&okul=' + encodeURIComponent(selected_okul);
+            var URL = 'http://secim2014.ogzd.me/sorgu?il=' + encodeURIComponent(selected_il) + '&ilce=' + encodeURIComponent(selected_ilce) + '&okul=' + encodeURIComponent(selected_okul);
             console.log(URL);
             $('#yorum-body').empty();
             $('#yorum-body').append('<div class="fb-comments" data-href="' + URL +'" data-numposts="5" data-colorscheme="light" width="400px"></div>');
