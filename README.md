@@ -17,6 +17,7 @@ There is also an open end of making statistical analysis of this data to produce
 You can access the system from <a href="http://secim2014.ogzd.me">here</a>. 
 
 Which technologies are used?
+--------------
 
 The whole application stack:
 - Django Web Framework
