@@ -24,3 +24,4 @@ The whole application stack:
 - Mongodb
 - uwsgi
 - nginx
+- Amazon EC2
